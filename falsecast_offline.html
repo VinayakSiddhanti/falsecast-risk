@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FALSECAST – Rice Blast Risk Calculator (Offline)</title>
+<style>
+  :root {
+    --green:#16a34a;
+    --green-light:#22c55e;
+    --green-dark:#065f46;
+    --bg:#f0fdf4;
+    --text:#022c22;
+    --muted:#4b5563;
+    --card:#ffffff;
+    --radius:14px;
+  }
+  body {
+    font-family: "Inter", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin:0;
+    line-height:1.5;
+  }
+  header {
+    background: linear-gradient(135deg,var(--green),var(--green-dark));
+    color:white;
+    padding:40px 20px;
+    text-align:center;
+  }
+  header h1 {margin:0;font-size:2em}
+  header p {max-width:600px;margin:10px auto 0;font-size:1em}
+  main {
+    max-width:900px;
+    margin:40px auto;
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:0 4px 12px rgba(0,0,0,0.08);
+    padding:20px 24px;
+  }
+  h2 {color:var(--green-dark)}
+  form {display:grid;gap:12px;margin-top:16px;}
+  label {font-weight:600;font-size:0.95em}
+  input, select {
+    padding:10px 12px;
+    border:1px solid #d1d5db;
+    border-radius:var(--radius);
+    font-size:1em;
+    width:100%;
+  }
+  button {
+    background:var(--green);
+    color:white;
+    border:none;
+    padding:10px 16px;
+    border-radius:var(--radius);
+    font-size:1em;
+    font-weight:600;
+    cursor:pointer;
+  }
+  button:hover {background:var(--green-dark);}
+  .result {
+    background:#ecfdf5;
+    border-left:5px solid var(--green);
+    padding:16px;
+    border-radius:var(--radius);
+    margin-top:20px;
+  }
+  .score-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:10px;
+    margin-top:10px;
+  }
+  .score-box {
+    background:#f9fafb;
+    border:1px solid #e5e7eb;
+    border-radius:var(--radius);
+    padding:10px;
+  }
+  .gallery {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:12px;
+    margin-top:20px;
+  }
+  .gallery img {
+    width:100%;
+    border-radius:var(--radius);
+    height:160px;
+    object-fit:cover;
+  }
+  .team {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:16px;
+    margin-top:20px;
+  }
+  .member {
+    background:#f9fafb;
+    border-radius:var(--radius);
+    padding:16px;
+    border:1px solid #e5e7eb;
+  }
+  footer {
+    text-align:center;
+    color:var(--muted);
+    font-size:0.9em;
+    padding:20px;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>FALSECAST: Rice Blast Risk Forecast System</h1>
+  <p contenteditable="true">
+    FALSECAST is a decision-support tool that predicts the risk of rice blast disease based on key weather parameters such as humidity, temperature, and rainfall. 
+    It helps farmers and researchers make informed decisions about fungicide applications and crop management.
+  </p>
+</header>
+
+<main>
+  <h2>Enter Weekly Weather & Disease Data</h2>
+  <form id="falsecastForm" onsubmit="return false;">
+    <div>
+      <label>Variety</label>
+      <select id="variety">
+        <option>GNV 10-89</option>
+        <option>KRH-4</option>
+      </select>
+    </div>
+    <div>
+      <label>Sowing window</label>
+      <select id="sowing">
+        <option>D1</option><option>D2</option><option>D3</option><option>D4</option>
+      </select>
+    </div>
+    <div><label>Evening RH (%)</label><input id="rh_eve" type="number" step="0.1" required></div>
+    <div><label>Minimum temperature (°C)</label><input id="tmin" type="number" step="0.1" required></div>
+    <div><label>Rainfall (mm)</label><input id="rainfall" type="number" step="0.1" required></div>
+    <div><label>Previous week PDI (%)</label><input id="prev_pdi" type="number" step="0.1" required></div>
+    <div><label>Current observed PDI (%)</label><input id="curr_pdi" type="number" step="0.1" required></div>
+    <button type="button" onclick="computeRisk()">Compute Risk</button>
+  </form>
+
+  <div id="result" class="result" style="display:none">
+    <h3>Results</h3>
+    <p><strong>Weekly Risk Index (WRI):</strong> <span id="wri"></span></p>
+    <p><strong>Risk Category:</strong> <span id="category"></span></p>
+    <p><strong>Spray Advisory:</strong> <span id="advisory"></span></p>
+    <div class="score-grid">
+      <div class="score-box"><strong>Evening RH Score:</strong> <span id="s_eve"></span></div>
+      <div class="score-box"><strong>Temperature Score:</strong> <span id="s_tmin"></span></div>
+      <div class="score-box"><strong>Rainfall Score:</strong> <span id="s_rain"></span></div>
+      <div class="score-box"><strong>Epidemic Momentum:</strong> <span id="s_mom"></span></div>
+    </div>
+  </div>
+
+  <h2>Rice Crop Images</h2>
+  <div class="gallery">
+    <img src="C:\Amogh\Amoghnew\IMG_4242.jpg" alt="Rice field">
+    <img src="C:\Amogh\Amoghnew\RiceBlast1.jpg" alt="Rice blast infection">
+    <img src="C:\Amogh\Amoghnew\field.jpg" alt="Paddy field">
+  </div>
+
+  <h2>Meet the Team</h2>
+  <div class="team">
+    <div class="member" contenteditable="true">
+      <h3>Dr. A. Kumar</h3>
+      <p>Plant Pathologist specializing in rice blast disease modeling and field trials.</p>
+    </div>
+    <div class="member" contenteditable="true">
+      <h3>Ms. R. Singh</h3>
+      <p>Data scientist working on weather-based disease prediction systems and AI integration.</p>
+    </div>
+    <div class="member" contenteditable="true">
+      <h3>Mr. S. Patel</h3>
+      <p>Agronomist focusing on crop management practices and extension advisory services.</p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  © 2025 FALSECAST Project | All content editable for customization.
+</footer>
+
+<script>
+function score_evening_rh(rh){ if(rh>=65)return 2; if(rh>=55)return 1; return 0; }
+function score_min_temp(t){ if(t>=17&&t<=21)return 2; if((t>=16&&t<17)||(t>21&&t<=23))return 1; return 0; }
+function score_rainfall(r){ if(r>=5)return 2; if(r>0)return 1; return 0; }
+function score_momentum(prev,curr){ const d=curr-prev; if(d>=5)return 2; if(d>=1)return 1; return 0; }
+function classify_wri(w){ if(w<=2)return"Low"; if(w<=4)return"Moderate"; return"High"; }
+
+function computeRisk(){
+  // get input values safely
+  const rh = parseFloat(document.getElementById('rh_eve').value) || 0;
+  const tmin = parseFloat(document.getElementById('tmin').value) || 0;
+  const rain = parseFloat(document.getElementById('rainfall').value) || 0;
+  const prev = parseFloat(document.getElementById('prev_pdi').value) || 0;
+  const curr = parseFloat(document.getElementById('curr_pdi').value) || 0;
+  const variety = document.getElementById('variety').value;
+
+  // calculate scores
+  const sE = score_evening_rh(rh);
+  const sT = score_min_temp(tmin);
+  const sR = score_rainfall(rain);
+  const sM = score_momentum(prev, curr);
+  const wri = sE + sT + sR + sM;
+  const category = classify_wri(wri);
+
+  // variety-specific threshold
+  const threshold = variety.includes("KRH") ? 4 : 5;
+
+  // spray advisory logic
+  let spray = false;
+  if (wri >= threshold && category === "High") spray = true;
+  if (curr > 0 && rh >= 65 && tmin >= 17 && tmin <= 21) spray = true;
+
+  // show results section
+  const result = document.getElementById("result");
+  result.style.display = "block";
+
+  // fill result fields
+  document.getElementById("wri").textContent = wri;
+  document.getElementById("category").textContent = category;
+  document.getElementById("advisory").textContent = spray
+    ? "⚠️ Apply fungicide — high risk"
+    : "✅ No immediate spray required";
+
+  document.getElementById("s_eve").textContent = sE;
+  document.getElementById("s_tmin").textContent = sT;
+  document.getElementById("s_rain").textContent = sR;
+  document.getElementById("s_mom").textContent = sM;
+}
+</script>
+
+</body>
+</html>
