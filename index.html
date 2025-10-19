@@ -1,242 +1,363 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>FALSECAST – Rice Blast Risk Calculator (Offline)</title>
-<style>
-  :root {
-    --green:#16a34a;
-    --green-light:#22c55e;
-    --green-dark:#065f46;
-    --bg:#f0fdf4;
-    --text:#022c22;
-    --muted:#4b5563;
-    --card:#ffffff;
-    --radius:14px;
-  }
-  body {
-    font-family: "Inter", system-ui, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    margin:0;
-    line-height:1.5;
-  }
-  header {
-    background: linear-gradient(135deg,var(--green),var(--green-dark));
-    color:white;
-    padding:40px 20px;
-    text-align:center;
-  }
-  header h1 {margin:0;font-size:2em}
-  header p {max-width:600px;margin:10px auto 0;font-size:1em}
-  main {
-    max-width:900px;
-    margin:40px auto;
-    background:var(--card);
-    border-radius:var(--radius);
-    box-shadow:0 4px 12px rgba(0,0,0,0.08);
-    padding:20px 24px;
-  }
-  h2 {color:var(--green-dark)}
-  form {display:grid;gap:12px;margin-top:16px;}
-  label {font-weight:600;font-size:0.95em}
-  input, select {
-    padding:10px 12px;
-    border:1px solid #d1d5db;
-    border-radius:var(--radius);
-    font-size:1em;
-    width:100%;
-  }
-  button {
-    background:var(--green);
-    color:white;
-    border:none;
-    padding:10px 16px;
-    border-radius:var(--radius);
-    font-size:1em;
-    font-weight:600;
-    cursor:pointer;
-  }
-  button:hover {background:var(--green-dark);}
-  .result {
-    background:#ecfdf5;
-    border-left:5px solid var(--green);
-    padding:16px;
-    border-radius:var(--radius);
-    margin-top:20px;
-  }
-  .score-grid {
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-    gap:10px;
-    margin-top:10px;
-  }
-  .score-box {
-    background:#f9fafb;
-    border:1px solid #e5e7eb;
-    border-radius:var(--radius);
-    padding:10px;
-  }
-  .gallery {
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:12px;
-    margin-top:20px;
-  }
-  .gallery img {
-    width:100%;
-    border-radius:var(--radius);
-    height:160px;
-    object-fit:cover;
-  }
-  .team {
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-    gap:16px;
-    margin-top:20px;
-  }
-  .member {
-    background:#f9fafb;
-    border-radius:var(--radius);
-    padding:16px;
-    border:1px solid #e5e7eb;
-  }
-  footer {
-    text-align:center;
-    color:var(--muted);
-    font-size:0.9em;
-    padding:20px;
-  }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FALSECAST — Rice Blast Risk</title>
+  <style>
+    :root{
+      --green:#16a34a;
+      --green-2:#22c55e;
+      --green-dark:#065f46;
+      --bg:#f3fbf6;
+      --card:#ffffff;
+      --text:#05281f;
+      --muted:#3f5a50;
+      --radius:14px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+      background:var(--bg);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:20px;
+      display:flex;
+      justify-content:center;
+    }
+    .site{
+      width:100%;
+      max-width:980px;
+    }
+    header{
+      background:linear-gradient(135deg,var(--green),var(--green-dark));
+      color:white;
+      border-radius:12px;
+      padding:28px;
+      text-align:center;
+      box-shadow:0 8px 30px rgba(6,95,70,0.12);
+    }
+    header h1{margin:0;font-size:1.6rem}
+    header p{margin:10px auto 0;max-width:760px;opacity:0.95}
+    main{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns:1fr 360px;
+      gap:18px;
+    }
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      padding:16px;
+      box-shadow:0 6px 18px rgba(9,46,36,0.04);
+      border:1px solid rgba(5,40,31,0.04);
+    }
+    .left{min-height:320px}
+    h2{color:var(--green-dark);margin:0 0 8px 0}
+    label{display:block;font-weight:700;margin-bottom:6px;color:var(--muted)}
+    input[type=number]{
+      width:100%;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid #e6f2ea;
+      background:linear-gradient(180deg,#fbfff9,#f6fff7);
+      font-size:1rem;
+      color:var(--text);
+      outline:none;
+    }
+    .form-grid{display:grid;gap:10px}
+    .btn{
+      display:inline-block;padding:10px 14px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--green),var(--green-2));color:white;font-weight:700;cursor:pointer;
+    }
+    .muted{color:var(--muted);font-size:0.95rem}
+    .result{
+      margin-top:12px;background:linear-gradient(180deg,#f7fff7,#f0fff3);border-left:6px solid var(--green);padding:12px;border-radius:10px;
+    }
+    .big{font-size:28px;font-weight:800;color:var(--green-dark)}
+    .score-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+    .score{
+      flex:1;min-width:100px;background:#ffffff;border-radius:10px;padding:10px;border:1px solid rgba(6,95,70,0.04);
+    }
+    .gallery{
+      display:grid;
+      gap:10px;
+      grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+      margin-top:12px;
+    }
+    .gallery img{width:100%;height:110px;object-fit:cover;border-radius:10px;border:1px solid rgba(0,0,0,0.03)}
+    .team{margin-top:14px;display:grid;gap:10px}
+    .member{padding:12px;border-radius:10px;background:#fff;border:1px solid rgba(6,95,70,0.03)}
+    footer{text-align:center;color:var(--muted);margin-top:18px;padding:10px 0;font-size:0.9rem}
+    @media (max-width:980px){
+      main{grid-template-columns:1fr; padding:0 12px}
+      .left, .card{width:100%}
+    }
+  </style>
 </head>
 <body>
-<header>
-  <h1>FALSECAST: Rice Blast Risk Forecast System</h1>
-  <p contenteditable="false">
-    FALSECAST is a decision-support tool that predicts the risk of rice blast disease based on key weather parameters such as humidity, temperature, and rainfall. 
-    It helps farmers and researchers make informed decisions about fungicide applications and crop management.
-  </p>
-</header>
+  <div class="site">
+    <header>
+      <h1>FALSECAST — False Smut Disease Risk Forecast</h1>
+      <p contenteditable="true">
+        FALSECAST is a web enabled forecasting and advisory system for Rice False Smut based on weather thresholds and machine learning models.
+      </p>
+    </header>
 
-<main>
-  <h2>Enter Weekly Weather & Disease Data</h2>
-  <form id="falsecastForm" onsubmit="return false;">
-    <div>
-      <label>Variety</label>
-      <select id="variety">
-        <option>GNV 10-89</option>
-        <option>KRH-4</option>
-      </select>
-    </div>
-    <div>
-      <label>Sowing window</label>
-      <select id="sowing">
-        <option>D1</option><option>D2</option><option>D3</option><option>D4</option>
-      </select>
-    </div>
-    <div><label>Evening RH (%)</label><input id="rh_eve" type="number" step="0.1" required></div>
-    <div><label>Minimum temperature (°C)</label><input id="tmin" type="number" step="0.1" required></div>
-    <div><label>Rainfall (mm)</label><input id="rainfall" type="number" step="0.1" required></div>
-    <div><label>Previous week PDI (%)</label><input id="prev_pdi" type="number" step="0.1" required></div>
-    <div><label>Current observed PDI (%)</label><input id="curr_pdi" type="number" step="0.1" required></div>
-    <button type="button" onclick="computeRisk()">Compute Risk</button>
-  </form>
+    <main>
+      <!-- LEFT: inputs & results -->
+      <section class="card left" aria-labelledby="inputs">
+        <h2 id="inputs">Weather inputs</h2>
+        <p class="muted">Provide the weekly aggregated weather values below (required).</p>
 
-  <div id="result" class="result" style="display:none">
-    <h3>Results</h3>
-    <p><strong>Weekly Risk Index (WRI):</strong> <span id="wri"></span></p>
-    <p><strong>Risk Category:</strong> <span id="category"></span></p>
-    <p><strong>Spray Advisory:</strong> <span id="advisory"></span></p>
-    <div class="score-grid">
-      <div class="score-box"><strong>Evening RH Score:</strong> <span id="s_eve"></span></div>
-      <div class="score-box"><strong>Temperature Score:</strong> <span id="s_tmin"></span></div>
-      <div class="score-box"><strong>Rainfall Score:</strong> <span id="s_rain"></span></div>
-      <div class="score-box"><strong>Epidemic Momentum:</strong> <span id="s_mom"></span></div>
-    </div>
+        <div class="form-grid" style="margin-top:10px">
+          <div>
+            <label for="rh_eve">Evening Relative Humidity (%)</label>
+            <input id="rh_eve" type="number" step="0.1" min="0" max="100" placeholder="e.g., 68" required>
+          </div>
+
+          <div>
+            <label for="tmin">Minimum temperature (°C)</label>
+            <input id="tmin" type="number" step="0.1" placeholder="e.g., 19.4" required>
+          </div>
+
+          <div>
+            <label for="rainfall">Rainfall (mm)</label>
+            <input id="rainfall" type="number" step="0.1" min="0" placeholder="e.g., 6.0" required>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:6px">
+            <button class="btn" onclick="compute()">Compute PDI</button>
+            <button class="btn" style="background:#d1f6df;color:var(--green-dark);" onclick="resetForm()">Reset</button>
+          </div>
+        </div>
+
+        <div id="resultBox" class="result" style="display:none" aria-live="polite">
+          <h3 style="margin:0 0 6px 0">Prediction summary</h3>
+          <div style="display:flex;align-items:center;gap:18px">
+            <div>
+              <div class="muted">Predicted PDI</div>
+              <div id="pdiVal" class="big">— %</div>
+            </div>
+            <div>
+              <div class="muted">Risk category</div>
+              <div id="riskCat" style="font-weight:800;margin-top:6px">—</div>
+            </div>
+          </div>
+
+          <div class="score-row">
+            <div class="score"><div class="muted">Evening RH score</div><div id="s_eve" style="font-weight:700;margin-top:6px">—</div></div>
+            <div class="score"><div class="muted">Temperature score</div><div id="s_tmin" style="font-weight:700;margin-top:6px">—</div></div>
+            <div class="score"><div class="muted">Rainfall score</div><div id="s_rain" style="font-weight:700;margin-top:6px">—</div></div>
+          </div>
+
+          <div style="margin-top:10px" id="advice" class="muted">—</div>
+        </div>
+      </section>
+
+      <!-- RIGHT: gallery & team -->
+      <aside class="card" aria-labelledby="galleryHeading">
+        <h2 id="galleryHeading">Gallery</h2>
+        
+        <div class="gallery" id="gallery">
+          <img src="IMG_4236.jpg" alt="Rice plants">
+          <img src="IMG_4242.jpg" alt="Rice blast">
+          <img src="field.jpg" alt="Paddy field">
+        </div>
+
+        <h2 style="margin-top:14px">Team</h2>
+        <div class="team">
+  <div class="member" contenteditable="false">
+    <strong> Dr. Prasanna Kumar, M K </strong>
+    <div class="muted"> Professor and Head Department of Plant Pathology</div>
+    <div class="muted"> College of Agriculture, University of Agricultural Sciences, GKVK, Bengaluru - 560065 </div>
+    <div class="muted"> <a href ="mailto:babu_prasanna@rediffmail.com">babu_prasanna@rediffmail.com</a> </div>
+  </div>
+  
+  <div class="member" contenteditable="false">
+    <strong>Dr. Pramesh D. (Ph. D.)</strong>
+    <div class="muted">Senior Scientist (Plant Pathology),</div>
+    <div class="muted">CAR-Directorate of Mushroom Research, Solan, India</div>
+    <div class="muted"><a href ="mailto:parmi.iari@gmail.com">parmi.iari@gmail.com</a> </div>
+  </div>
+  
+  <div class="member" contenteditable="false">
+    <strong> Dr. Amoghavarsha Chittaragi</strong>
+    <div class="muted">Assistant Professor (Plant Pathology),</div>
+    <div class="muted">College of Agriculture, University of Agricultural Sciences, GKVK, Bengaluru - 560065 </div>
+    <div class="muted"><a href ="mailto:amoghchittaragi@gmail.com">amoghchittaragi@gmail.com</a> </div>
+  </div>
+</div>
+
+      </aside>
+    </main>
+	<section class="card" id="management" style="margin-top:18px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;">
+    <h2 style="color:var(--green-dark);margin:0;">Management of False Smut of Rice</h2>
+    <button id="toggleMgmt" class="btn" style="padding:6px 10px;font-size:0.9rem;background:var(--green-dark);">Show Info</button>
   </div>
 
-  <h2>Rice Crop Images</h2>
-  <div class="gallery">
-    <img src="IMG_4242.jpg" alt="Rice field">
-    <img src="RiceBlast1.jpg" alt="Rice blast infection">
-    <img src="field.jpg" alt="Paddy field">
-  </div>
+  <div id="mgmtContent" style="margin-top:10px;line-height:1.6;display:none;" contenteditable="true">
+    <p><strong>1. Use of Resistant/Tolerant Varieties</strong><br>
+    Prefer varieties known for tolerance or partial resistance to false smut as identified by regional trials.<br>
+    Avoid highly susceptible high-yielding hybrids in endemic areas.</p>
 
-  <h2>Meet the Team</h2>
-  <div class="team">
-    <div class="member" contenteditable="false">
-      <h3>Dr. Amoghavarsha Chittargi</h3>
-      <p>BSc. MSc. PhD. | Assistant Professor and Scientist</p>
-      <p>Plant Pathologist specializing in rice blast disease modeling and field trials.</p>
-    </div>
-    <div class="member" contenteditable="false">
-      <h3>Vinayak Siddhanti</h3>
-      <p>Data scientist working on weather-based disease prediction systems and AI integration.</p>
-    </div>
-    <div class="member" contenteditable="false">
-      <h3>Mr. Virat Kohli</h3>
-      <p>Agronomist focusing on crop management practices and extension advisory services.</p>
-    </div>
-  </div>
-</main>
+    <p><strong>2. Use of Disease-Free and Treated Seed</strong><br>
+    Select healthy, smut-free seed from disease-free fields.<br>
+    Treat seed with fungicides such as <em>Carbendazim</em> 2 g/kg or <em>Tebuconazole</em> 1 g/kg before sowing to eliminate seed-borne inoculum.</p>
 
-<footer>
-  © 2025 FALSECAST Project | All content editable for customization.
-</footer>
+    <p><strong>3. Crop Rotation and Field Sanitation</strong><br>
+    Rotate rice with non-host crops for at least one season.<br>
+    Remove and destroy infected panicles and stubble after harvest to reduce primary inoculum.</p>
+
+    <p><strong>4. Balanced Fertilization and Nutrient Management</strong><br>
+    Avoid excessive nitrogen application, especially late in the crop season, as it increases disease susceptibility.<br>
+    Apply balanced doses of N:P:K and micronutrients (Zn, Si) to enhance host resistance.</p>
+
+    <p><strong>5. Optimum Sowing Time and Crop Density</strong><br>
+    Adjust sowing dates to avoid conditions favorable for infection (high humidity, frequent rains during flowering).<br>
+    Maintain recommended plant spacing to ensure good aeration and reduce canopy humidity.</p>
+
+    <p><strong>6. Fungicidal Sprays at Critical Stages</strong><br>
+    Apply fungicides at booting to early panicle emergence stage (75–85 days after transplanting):</p>
+    <ul style="margin:6px 0 6px 18px;">
+      <li>Propiconazole 25 EC @ 0.1%</li>
+      <li>Tebuconazole 25 EC @ 1 ml/L</li>
+      <li>Hexaconazole 5 EC @ 2 ml/L</li>
+      <li>Trifloxystrobin + Tebuconazole 75 WG @ 0.5 g/L</li>
+    </ul>
+    <p>A second spray after 10–12 days can be given in high-risk fields.</p>
+  </div>
+</section>
 
 <script>
-function score_evening_rh(rh){ if(rh>=65)return 2; if(rh>=55)return 1; return 0; }
-function score_min_temp(t){ if(t>=17&&t<=21)return 2; if((t>=16&&t<17)||(t>21&&t<=23))return 1; return 0; }
-function score_rainfall(r){ if(r>=5)return 2; if(r>0)return 1; return 0; }
-function score_momentum(prev,curr){ const d=curr-prev; if(d>=5)return 2; if(d>=1)return 1; return 0; }
-function classify_wri(w){ if(w<=2)return"Low"; if(w<=4)return"Moderate"; return"High"; }
+  // Collapsible management info
+  const btn = document.getElementById('toggleMgmt');
+  const content = document.getElementById('mgmtContent');
 
-function computeRisk(){
-  // get input values safely
-  const rh = parseFloat(document.getElementById('rh_eve').value) || 0;
-  const tmin = parseFloat(document.getElementById('tmin').value) || 0;
-  const rain = parseFloat(document.getElementById('rainfall').value) || 0;
-  const prev = parseFloat(document.getElementById('prev_pdi').value) || 0;
-  const curr = parseFloat(document.getElementById('curr_pdi').value) || 0;
-  const variety = document.getElementById('variety').value;
-
-  // calculate scores
-  const sE = score_evening_rh(rh);
-  const sT = score_min_temp(tmin);
-  const sR = score_rainfall(rain);
-  const sM = score_momentum(prev, curr);
-  const wri = sE + sT + sR + sM;
-  const category = classify_wri(wri);
-
-  // variety-specific threshold
-  const threshold = variety.includes("KRH") ? 4 : 5;
-
-  // spray advisory logic
-  let spray = false;
-  if (wri >= threshold && category === "High") spray = true;
-  if (curr > 0 && rh >= 65 && tmin >= 17 && tmin <= 21) spray = true;
-
-  // show results section
-  const result = document.getElementById("result");
-  result.style.display = "block";
-
-  // fill result fields
-  document.getElementById("wri").textContent = wri;
-  document.getElementById("category").textContent = category;
-  document.getElementById("advisory").textContent = spray
-    ? "⚠️ Apply fungicide — high risk"
-    : "✅ No immediate spray required";
-
-  document.getElementById("s_eve").textContent = sE;
-  document.getElementById("s_tmin").textContent = sT;
-  document.getElementById("s_rain").textContent = sR;
-  document.getElementById("s_mom").textContent = sM;
-}
+  btn.addEventListener('click', () => {
+    const isVisible = content.style.display === 'block';
+    content.style.display = isVisible ? 'none' : 'block';
+    btn.textContent = isVisible ? 'Show Info' : 'Hide Info';
+    btn.style.background = isVisible ? 'var(--green-dark)' : 'var(--green)';
+  });
 </script>
 
+    <footer>
+      <div class="muted">All content editable inline. This page runs fully offline — you can host it as a static file.</div>
+    </footer>
+  </div>
+
+<script>
+  // Scoring functions
+  function scoreEveningRH(rh){
+    if (rh === null || isNaN(rh)) return 0;
+    if (rh >= 65) return 2;
+    if (rh >= 55) return 1;
+    return 0;
+  }
+  function scoreMinTemp(t){
+    if (t === null || isNaN(t)) return 0;
+    if (t >= 17 && t <= 21) return 2;
+    if ((t >= 16 && t < 17) || (t > 21 && t <= 23)) return 1;
+    return 0;
+  }
+  function scoreRainfall(r){
+    if (r === null || isNaN(r)) return 0;
+    if (r >= 5) return 2;
+    if (r > 0) return 1;
+    return 0;
+  }
+
+  function classifyWRI(wri){
+    if (wri <= 2) return 'Low';
+    if (wri <= 4) return 'Moderate';
+    return 'High';
+  }
+
+  // Deterministic PDI mapping:
+  // PDI% = round( (WRI / 6) * 30 )
+  // (0 -> 0%, 6 -> 30%)
+  function pdiFromWRI(wri){
+    const pdi = Math.round( (wri / 6) * 30 );
+    return pdi;
+  }
+
+  function compute(){
+    // safe parse
+    const rh = parseFloat(document.getElementById('rh_eve').value);
+    const tmin = parseFloat(document.getElementById('tmin').value);
+    const rain = parseFloat(document.getElementById('rainfall').value);
+
+    // basic validation
+    if (isNaN(rh) || isNaN(tmin) || isNaN(rain)){
+      alert('Please fill all three weather inputs (Evening RH, Minimum Temp, Rainfall).');
+      return;
+    }
+    if (rh < 0 || rh > 100){
+      alert('Evening RH must be between 0 and 100.');
+      return;
+    }
+
+    // scores
+    const sE = scoreEveningRH(rh);
+    const sT = scoreMinTemp(tmin);
+    const sR = scoreRainfall(rain);
+    const wri = sE + sT + sR; // 0..6
+
+    const pdi = pdiFromWRI(wri); // single deterministic number
+    const category = classifyWRI(wri);
+
+    // advisory: recommend spray if High OR (PDI >= 15 and conditions favorable)
+    let advisoryText = 'No immediate spray recommended. Continue monitoring.';
+    if (category === 'High') {
+      advisoryText = '⚠️ High risk — fungicide application recommended.';
+    } else if (pdi >= 15 && rh >= 65 && tmin >= 17 && tmin <= 21) {
+      advisoryText = '⚠️ Elevated PDI and favorable conditions — consider protective measures.';
+    }
+
+    // update UI
+    document.getElementById('resultBox').style.display = 'block';
+    document.getElementById('pdiVal').textContent = pdi + ' %';
+    document.getElementById('riskCat').textContent = category;
+    document.getElementById('s_eve').textContent = sE;
+    document.getElementById('s_tmin').textContent = sT;
+    document.getElementById('s_rain').textContent = sR;
+    document.getElementById('advice').textContent = advisoryText;
+
+    // color cue on result
+    const resultBox = document.getElementById('resultBox');
+    if (category === 'Low') {
+      resultBox.style.borderLeftColor = '#22c55e';
+    } else if (category === 'Moderate'){
+      resultBox.style.borderLeftColor = '#f59e0b';
+    } else {
+      resultBox.style.borderLeftColor = '#ef4444';
+    }
+  }
+
+  // wrapper to avoid conflict with compute() name in earlier code
+  function computeRisk(){ compute(); }
+
+  // wire compute() to global compute() name used by buttons
+  window.compute = compute;
+
+  function resetForm(){
+    document.getElementById('rh_eve').value = '';
+    document.getElementById('tmin').value = '';
+    document.getElementById('rainfall').value = '';
+    document.getElementById('resultBox').style.display = 'none';
+  }
+
+  // allow Enter to trigger compute when inside inputs
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Enter' && (document.activeElement.tagName === 'INPUT')) {
+      e.preventDefault();
+      compute();
+    }
+  });
+
+</script>
 </body>
 </html>
-
-
-
